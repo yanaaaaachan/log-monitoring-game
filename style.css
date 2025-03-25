@@ -14,13 +14,16 @@ body{
 .table_area{
     overflow-y: scroll;
     /* height: 100vh; */
-    height:70vh;
+    height:65vh;
     border: solid 2px #4D4535;
     border-radius: 3px;
 }
 th,td{
     border: solid 1px #4D4535;
-    white-space:nowrap
+    /* white-space:nowrap; */
+    max-width:35em;
+    min-width:2em;
+    word-break:keep-all
 }
 tr{
     background-color: #FBFCFD;
@@ -47,7 +50,7 @@ padding:20px;
 }
 .main{
     /* display: flex; */
-    margin:5px 0px 0px 0px;
+    margin:0px 0px 0px 0px;
     /* height: 85vh; */
 }
 .answer_area{
@@ -55,7 +58,7 @@ padding:20px;
     padding:0px 10px 0px 10px;
     margin-top: 10px;
     margin-right: 0px;
-    width:40%;
+    width:30%;
     background-color: white;
 }
 .is_true_box{
@@ -64,8 +67,51 @@ padding:20px;
     margin-top: 10px;
     margin-left: 10px;
     background-color: white;
-    width:40%;
+    width:25%;
 }
+#list_img{
+    width:4%;
+    height:9%;
+    margin-left:25%;
+    margin-top:1%;
+    cursor: pointer;
+    position: absolute;
+}
+.list_flex{
+    display: flex;
+}
+#list_area{
+    position: absolute;
+    display: none;
+    background-color: rgb(70, 70, 70);
+color:white;
+padding:10px;    
+margin-left:30%;
+margin-top:-20%;
+}
+#close_btn {
+    display: block;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+  }
+#close_btn::before, #close_btn::after{
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: 260px;
+    width: 5px; /* 棒の幅（太さ） */
+    height: 25px; /* 棒の高さ */
+    background: white;
+}
+#close_btn::before {
+    transform: translate(-50%,-50%) rotate(45deg);
+  }
+   
+  #close_btn::after {
+    transform: translate(-50%,-50%) rotate(-45deg);
+  }
 .answer_area h2{
     text-align: center;
 }
@@ -78,13 +124,8 @@ padding:20px;
 /* .answer_select{
     position: absolute;
 } */
-#answer_btn{
-    background-color: #28A6A5;
-    margin-left: 5%;
-    cursor: pointer;
-    margin-top: 50px;
-    height:fit-content;
-
+.btn_flex{
+    display: flex;
 }
 #answer_btn{
     display: block;
@@ -96,14 +137,38 @@ padding:20px;
     border-color: aliceblue;
     box-shadow: 0 7px 0 #175e5e;
     border-radius: 60px;
+    cursor: pointer;
+    margin-top: -10px;
+    height:fit-content;
+    white-space:nowrap;
 }
 #answer_btn:hover{
     background-color: #28A6A5;
     box-shadow: none;
     transform: translateY(4px);
 }
+#final_answer{
+    display: block;
+    background-color: #e6b136;
+    width:fit-content;
+    transition: background-color 0.3s, transform 0.3s;
+    padding: 10px 10px;
+    text-align: center;
+    border-color: aliceblue;
+    box-shadow: 0 7px 0 #6b4d09;
+    border-radius: 60px;
+    cursor: pointer;
+    margin-top: -10px;
+    margin-left: 85px;
+    height:fit-content;
+    white-space:nowrap;
+}
+#final_answer:hover{
+    box-shadow: none;
+    transform: translateY(4px);
+}
 #suspicious_type{
-    width:90%;
+    width:80%;
 }
 #isTrue{
     color:#28A6A5;
