@@ -94,11 +94,12 @@
         <br>
         <h1>結果</h1>
         <div>
-            <h2>《あなたの不正アクセス発見率》</h2>
-            <h3 id="your_score"></h3>
+            <h3>《あなたの不正アクセス発見率》</h3>
+            <h2><span id="your_score"></span>個正解/<span id="badaccess_num"></span>個中（正答率：<span id="correct_rate"></span>%）</h2>
         </div>
+        <br>
         <div>
-            <h2>《詳細》</h2>
+            <h3>《詳細》</h3>
             <div>
                 <table id="result_table">
                     <tr>
@@ -686,6 +687,8 @@
             // console.log(user_answer_list[String(1)])
             //結果へ
             let YourScore = document.getElementById("your_score")
+            let BadaccessNum=document.getElementById("badaccess_num")
+            let CorrectRate=document.getElementById("correct_rate")
             let FinalAnswer = document.getElementById("final_answer")
             let ResultTable = document.getElementById("result_table")
             let TableBody2 = document.getElementById("table_body2")
@@ -706,7 +709,11 @@
                     if (user_answer_list[j] === "") {
                         user_answer_list[j] = "不正アクセスではない"
                     }
-                    YourScore.innerText = sum_of_selected + "個正解/" + sum_of_badaccess + "個中 (正答率：" + Math.floor(sum_of_selected / sum_of_badaccess * 100) + "%)"
+                    correctrate=Math.floor(sum_of_selected / sum_of_badaccess * 100)
+                    // YourScore.innerText = sum_of_selected + "個正解/" + sum_of_badaccess + "個中 (正答率：" + Math.floor(sum_of_selected / sum_of_badaccess * 100) + "%)"
+                    YourScore.innerText=sum_of_selected;
+                    BadaccessNum.innerText=sum_of_badaccess;
+                    CorrectRate.innerText=correctrate;
                     TableBody2.innerHTML += `
         <td>${j}</td>
         <td>${String(user_answer_list[j])}</td>
@@ -757,6 +764,7 @@
 
                         // 新しい行を挿入
                         let newRow = ResultTable.insertRow(rowIndex + 1);
+                        newRow.style.backgroundColor="gray"
                         let cell1 = newRow.insertCell(0); // 1列目
                         cell1.colSpan = 1;
 

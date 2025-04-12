@@ -210,3 +210,9 @@ html {
     text-decoration: none;
     color:rgb(70, 70, 70);
   }
+  #your_score{
+    color:#28A6A5;
+  }
+  #correct_rate{
+    color:#28A6A5;
+  }
