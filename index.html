@@ -329,8 +329,9 @@
 
                 // 3️⃣ **正常なログを作る**
                 for (let i = 0; i < nomal_activity_times; i++) {
+                    let candidates_logType=[logTypes[0],logTypes[1],logTypes[2],logTypes[3],logTypes[4]]
                     let ip = normalIPs[Math.floor(Math.random() * normalIPs.length)];
-                    let logType = logTypes[Math.floor(Math.random() * logTypes.length)];
+                    let logType = candidates_logType[Math.floor(Math.random() * candidates_logType.length)];
                     let status_code = StatusCodes[0]
                     if (logType === "access") {
                         let file_candidates = ["/profile.jpg", "banner.png", "/about.html", "/index.html", "script.js", "style.css", "access.log"];
@@ -752,39 +753,54 @@
                 let rows2 = TableBody2.getElementsByTagName("tr"); // 既にある<tr>たち
 
                 for (let g = 1; g <= 20; g++) {
-                    let row1 = rows1[g - 1];
+                    let row1 = rows1[g ];
                     let row2 = rows2[g - 1]; // 配列は0始まりなので g-1
 
                     let question_line = document.getElementById(`line_${g}`);
                     row2.id = `line2_${g}`; // idを付ける
 
-                    row2.addEventListener("click", function () {
-                        let rowIndex = this.rowIndex;
-                        console.log(`line2_${g}がクリックされました！`);
+
 
                         // 新しい行を挿入
-                        let newRow = ResultTable.insertRow(rowIndex + 1);
-                        newRow.style.backgroundColor="gray"
-                        let cell1 = newRow.insertCell(0); // 1列目
-                        cell1.colSpan = 1;
+                        // let newRow = ResultTable.insertRow(rowIndex + 1);
+                        // newRow.style.backgroundColor="gray"
+                        // let cell1 = newRow.insertCell(0); // 1列目
+                        // cell1.colSpan = 1;
 
                         // question_line を新しい行に追加
                         // question_lineはDOM要素なので、そのまま追加する
-                        newRow.appendChild(question_line.cloneNode(true)); // cloneNodeで複製して追加
+                        // newRow.appendChild(question_line.cloneNode(true)); // cloneNodeで複製して追加
 
+                        insertedRow = null;
+                        isInserted = false;
                         // 追加した行をrow2の次の行として挿入
                         let nextSibling = rows2[g - 1].nextElementSibling;
-                        ResultTable.insertBefore(newRow, nextSibling);
+                        let row1Clone = row1.cloneNode(true);
+                        // ResultTable.insertBefore(newRow, nextSibling);
 
                         row2.addEventListener("click", function () {
-                            if (newRow) {
-                                ResultTable.deleteRow(existingRow.rowIndex);
+                            if (isInserted) {
+                                // ResultTable.deleteRow(insertedRow.rowIndex);
+                                insertedRow.remove();
+                                insertedRow = null;
+                                isInserted = false;
+                            }
+                            else{
+                                insertedRow = document.createElement("tr");
+            let cell = document.createElement("td");
+            cell.colSpan = row2.cells.length;
+            cell.style.backgroundColor = "gray";
+            cell.appendChild(row1Clone.cloneNode(true)); // 中身だけ挿入
+            insertedRow.appendChild(cell);
+
+            row2.parentNode.insertBefore(insertedRow, row2.nextSibling); // row2 のすぐ下に挿入
+            isInserted = true;
                             }
                         })
                         // ここにログ表示処理などを追加できます
                         // 例えば別のdivにログを表示したい場合:
                         // document.getElementById("log_display").innerText = LogLines[g - 1].details;
-                    });
+                    
                 }
 
 
