@@ -23,7 +23,8 @@
                     <th>logType</th>
                     <th>status_code</th>
                     <th>details</th>
-                    <th>アクセスファイル</th>
+                    <th>access_file</th>
+                    <!-- <th class="virus_check_th"></th> -->
                 </tr>
                 <tbody id="table_body"></tbody>
             </table>
@@ -54,18 +55,18 @@
                         </div>
                         <select id="suspicious_type">
                             <option value="怪しい時間">怪しい時間のアクセス</option>
-                            <option value="怪しい場所">怪しい地域からのアクセス</option>
+                            <option value="怪しい場所">制限された地域からのアクセス</option>
                             <option value="SQLインジェクション">SQLインジェクション</option>
                             <option value="クロスサイトスクリプティング">クロスサイトスクリプティング</option>
                             <option value="ブルートフォース攻撃">ブルートフォース攻撃</option>
-                            <option value="マルウェア感染">マルウェア感染</option>
+                            <option value="ランサムウェアの感染">ランサムウェアの感染</option>
                             <option value="アクセス権がない、または認証されていないユーザー">アクセス権がない、または認証されていないユーザーである</option>
                             <option value="ディレクトリトラバーサル">ディレクトリトラサーバル</option>
                         </select>
                         <h3>の疑いがある</h3>
                         <div class="btn_flex">
                             <h4 id="answer_btn">リストに追加する</h4>
-                            <a href="#to_result" id="final_answer">
+                            <a id="final_answer">
                                 <h4>最終報告をする</h4>
                             </a>
                         </div>
@@ -81,37 +82,46 @@
 
             </div>
             <div class="condition">
-<h3>《前提条件》</h3>
-<p>・就業時間は8時～22時</p>
-<p>・以前ロシアからサイバー攻撃を受けたことがある</p>
-<p>・5回以上連続の認証はブルートフォース攻撃と見なす</p>
-<p>・以下のファイル名はマルウェアソフトの可能性が高い：Petya, CryptoLocker, Stuxnet, WannaCry</p>
+                <h3>《前提条件》</h3>
+                <p>・就業時間は8時～22時</p>
+                <p>・以前ロシアからサイバー攻撃を受けたことがあり、利用を制限している</p>
+                <p>・5回以上連続の認証はブルートフォース攻撃と見なす</p>
             </div>
         </div>
     </div>
 
+    <!-- <div id="result_animation">
+        <h1>結果アニメーション</h1>
+        <img src="virus_img.png" alt="" id="result_animation_img">
+        <button id="to_result_details">結果詳細へ</button>
+    </div> -->
+
     <div id="to_result">
-        <br>
+        <span id="result_close_btn"></span>
         <h1>結果</h1>
-        <div>
-            <h3>《あなたの不正アクセス発見率》</h3>
-            <h2><span id="your_score"></span>個正解/<span id="badaccess_num"></span>個中（正答率：<span id="correct_rate"></span>%）</h2>
-        </div>
-        <br>
-        <div>
-            <h3>《詳細》</h3>
+
+        <div class="result_flex">
             <div>
-                <table id="result_table">
-                    <tr>
-                        <th>line</th>
-                        <th>あなたの回答</th>
-                        <th>正解</th>
-                        <th>結果</th>
-                    </tr>
-                    <tbody id="table_body2"></tbody>
-                </table>
+                <h3>《あなたの不正アクセス発見率》</h3>
+                <h2><span id="your_score"></span>個正解/<span id="badaccess_num"></span>個中<br>（正答率：<span
+                        id="correct_rate"></span>%）</h2>
+            </div>
+            <div class="result_table_div">
+                <h3>《詳細》</h3>
+                <div>
+                    <table id="result_table">
+                        <tr>
+                            <th>line</th>
+                            <th>あなたの回答</th>
+                            <th>正解</th>
+                            <th>結果</th>
+                        </tr>
+                        <tbody id="table_body2"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
     </div>
 
 
@@ -227,19 +237,24 @@
                 }
 
 
-                //マルウェア感染または不正なAPIリクエスト
+                //ランサムウェア感染
                 for (let i = 0; i < malware_times; i++) { // 3件の不正ログ
                     let ip = suspiciousIPs[Math.floor(Math.random() * suspiciousIPs.length)];
-                    let logType = logTypes[4];
+                    let logtype_candidates = [logTypes[4], logTypes[2], logTypes[0]];
+                    let logType = logtype_candidates[Math.floor(Math.random())];
                     let status_code = Math.random() < 0.5 ? StatusCodes[3] : StatusCodes[5];
                     let details = {};
-                    let file_name="";
-
+                    let file_name = "";
+                    let candidates_mal = ["important_document.exe", "invoice_April2025.pdf.exe", "meeting_notes.docx.exe", "holiday_schedule_2025.scr"];
+                    file_name = candidates_mal[Math.floor(Math.random() * candidates_mal.length)];
                     if (logType === "communication") {
-                        details.error_code = "Detected execution of suspicious file"
-                        let candidates_mal = ["Petya", "CryptoLocker", "Stuxnet","WannaCry"];
-                        file_name=candidates_mal[Math.floor(Math.random() * candidates_mal.length)];
-                        // details.query = suspiciousQueries[Math.floor(Math.random() * suspiciousQueries.length)];
+                        details.error_code = `Suspicious connection attempt detected to unknown IP (${ip})`
+                    }
+                    if (logType === "access") {
+                        details.error_code = "User downloaded a file from external URL"
+                    }
+                    if (logType === "operation") {
+                        details.error_code = "File execution started by user999"
                     }
                     logs.push({
                         timestamp: TimeList[Math.floor(Math.random() * TimeList.length)].toISOString(),
@@ -247,8 +262,8 @@
                         logType,
                         status_code,
                         details: { ErrorCode: "ErrorCode: " + details.error_code },
-                        file: "DownloadedFile: " + file_name,
-                        isSuspicious: "マルウェア感染"
+                        file: file_name,
+                        isSuspicious: "ランサムウェアの感染"
                     });
                 }
 
@@ -329,7 +344,7 @@
 
                 // 3️⃣ **正常なログを作る**
                 for (let i = 0; i < nomal_activity_times; i++) {
-                    let candidates_logType=[logTypes[0],logTypes[1],logTypes[2],logTypes[3],logTypes[4]]
+                    let candidates_logType = [logTypes[0], logTypes[1], logTypes[2], logTypes[3], logTypes[4]]
                     let ip = normalIPs[Math.floor(Math.random() * normalIPs.length)];
                     let logType = candidates_logType[Math.floor(Math.random() * candidates_logType.length)];
                     let status_code = StatusCodes[0]
@@ -390,12 +405,12 @@
                     let status_code;
 
                     if (logType === "access") {
-                        details.error_code = "GET /?file=public/logs/etc/system.log";
+                        details.error_code = "GET /?file=../../etc/system.log";
                         file_name = "system.log";
                         status_code = StatusCodes[0]
                     }
                     else if (logType === "error") {
-                        details.error_code = "File not found: /var/www/html/menu/login/etc/secret.pdf";
+                        details.error_code = "File not found: /var/../../../login/etc/secret.pdf";
                         file_name = "404 Not Found: secret.pdf"
                         status_code = "404"
                     }
@@ -475,40 +490,77 @@
         <td></td> <!-- details はあとで追加 -->
         <td>${ResultLog.file}</td>
     `;
+//ウイルスチェック
+                // let VirusCheck = document.createElement("img");
+                // VirusCheck.src = "button_unopened.png"
+
+                // row.children[7].appendChild(VirusCheck);
+                // row.children[7].id = "virus_check"
+
+                // VirusCheck.addEventListener("click", function () {
+                //     IsTrue.textContent = ""
+                //     IsTrue.textContent = "検査中..."
+                //     if (LogLines[lineNumber - 1].isSuspicious === "ランサムウェアの感染") {
+                //         let what_mal = ["important_document.exe", "invoice_April2025.pdf.exe", "meeting_notes.docx.exe", "holiday_schedule_2025.scr"];
+                //         let WhatMal = what_mal[Math.floor(Math.random() * what_mal.length)];
+                //         setTimeout(function () {
+                //             IsTrue.textContent = ""
+                //             IsTrue.innerHTML += `&#x26a0;${lineNumber}行目でランサムウェア感染を検出しました(${WhatMal})&#x26a0;`
+                //         }, 3000)
+                //     }
+                //     else {
+                //         setTimeout(function () {
+                //             IsTrue.textContent = ""
+                //             IsTrue.innerText += `${lineNumber}行目ではランサムウェアは検出されませんでした`
+                //         }, 3000)
+                //     }
+                // });
+
+                // let isVirusChecked = false;
+                // let UnderSurvey = false;
+
+                // VirusCheck.addEventListener("mouseover", function () {
+                //     if (isVirusChecked) return;
+                //     VirusCheck.src = "button_open_unpushed.png"
+                // })
+
+                // VirusCheck.addEventListener("click", function () {
+                //     UnderSurvey = true;
+                //     if (isVirusChecked) return;
+                //     VirusCheck.src = "button_open_pushed.png"
+
+                //     if (LogLines[lineNumber - 1].isSuspicious === "ランサムウェアの感染") {
+                //         isVirusChecked = true;
+                //         setTimeout(function () {
+                //             VirusCheck.src = "virus_img.png";
+                //             UnderSurvey = false
+                //         }, 3000)
+                //     }
+
+                //     else {
+                //         setTimeout(function () {
+                //             VirusCheck.src = "button_open_unpushed.png";
+                //             UnderSurvey = false;
+                //         }, 3000)
+                //     }
+                // })
+
+                // VirusCheck.addEventListener("mouseout", function () {
+                //     if (UnderSurvey) return;
+                //     if (isVirusChecked) return;
+                //     VirusCheck.src = "button_unopened.png"
+                // })
+
+
+
+
 
                 let detailsTd = row.children[5]; // 6番目のtd（0-indexed）
                 detailsTd.innerText = ResultLog_details_words;
 
                 // テーブルに追加
                 document.getElementById("table_body").appendChild(row);
-                // let row = `<tr id="line_${lineNumber}" name="${lineNumber}">
-                //     <td>${lineNumber}</td>
-                //     <td>${ResultLog.timestamp}</td>
-                //     <td>${ResultLog.ip}</td>
-                //     <td>${ResultLog.logType}</td>
-                //     <td>${ResultLog.status_code}</td>
-                //     <td>${ResultLog_details_words}</td>
-                //     <td>${ResultLog.file}</td>
-                // </tr>`;
-                // console.log(ResultLog.details)
-                // document.getElementById("table_body").innerHTML += row;
 
-
-                //     row.addEventListener("click", function(event) {
-                //     const tr = event.target.closest("tr");
-
-                //     if (tr) {
-                //       const currentColor = tr.style.backgroundColor;
-                //       if (
-                //         currentColor === "#FBFCFD" ||
-                //         currentColor === "rgb(251, 252, 253)"
-                //       ) {
-                //         tr.style.backgroundColor = "#96e8e8";
-                //       } else {
-                //         tr.style.backgroundColor = "#FBFCFD";
-                //       }
-                //     }
-                //   });
 
             });
             console.log(LogLines[6].ip)
@@ -547,6 +599,9 @@
                 if (line) {
 
                     line.addEventListener("click", function () {
+                        // if (event.target.tagName === "IMG") {
+                        //     return;
+                        // }
                         // let index = Selected_line_list.indexOf(i);
                         // for (let j = 1; j <= 20; j++) {
                         //     let otherLine = document.getElementById(`line_${j}`);
@@ -557,7 +612,9 @@
                         // 🎨 背景色のトグル処理
                         if (line.style.backgroundColor === '' || line.style.backgroundColor === 'rgb(251, 252, 253)') {
                             UserAnswer.textContent = ""
-                            line.style.backgroundColor = '#96e8e8'; // 選択時の色
+
+
+                            line.style.backgroundColor = '#515151'; // 選択時の色
                             Selected_line_list.push(i);
                             UserAnswer.textContent += Selected_line_list;
                             UserSelectLine = i;
@@ -575,6 +632,7 @@
                         // }
 
                     });
+
                 }
                 if (line !== null) {
                     AnswerBtn.addEventListener("click", function () {
@@ -586,12 +644,12 @@
             }
 
 
-
-            //回答の判定
+            //回答の判定(current_situation)
             // if(UserSelectLine && SuspiciousType){
             let sum_of_selected = 0;
             let user_answer_list = {}
             AnswerBtn.addEventListener("click", function () {
+                
                 IsTrue.textContent = ""
                 for (let k = 0; k < Selected_line_list.length; k++) {
                     //             console.log(k)
@@ -605,8 +663,7 @@
                         CorrectList.innerHTML += "・" + Selected_line_list[k] + "行目の" + SuspiciousType.value + '<br>'
                         user_answer_list[Selected_line_list[k]] = SuspiciousType.value
                         sum_of_selected = sum_of_selected + 1;
-                        answered_line.style.color = "green"
-
+                        answered_line.style.color = "rgb(185, 0, 0)"
                     } else {
                         IsTrue.innerText += Selected_line_list[k] + "行目が不正解\n"
                         user_answer_list[Selected_line_list[k]] = SuspiciousType.value
@@ -688,44 +745,65 @@
             // console.log(user_answer_list[String(1)])
             //結果へ
             let YourScore = document.getElementById("your_score")
-            let BadaccessNum=document.getElementById("badaccess_num")
-            let CorrectRate=document.getElementById("correct_rate")
+            let BadaccessNum = document.getElementById("badaccess_num")
+            let CorrectRate = document.getElementById("correct_rate")
             let FinalAnswer = document.getElementById("final_answer")
             let ResultTable = document.getElementById("result_table")
             let TableBody2 = document.getElementById("table_body2")
             let ResultWhich
+            let ToResult = document.getElementById("to_result")
+            // let IsFinalAnswer = false;
+            // let ToResultDetails=document.getElementById("to_result_details")
+            // let ResultAnimation = document.getElementById("result_animation");
+
+            // FinalAnswer.addEventListener("click", function () {
+            //         setTimeout(function () {
+            //             ResultAnimation.style.display = "block"
+            //         }, 200)
+            //     })
+
             FinalAnswer.addEventListener("click", function () {
-                for (let j = 1; j <= 20; j++) {
-                    // let currentRow = TableBody2.rows[j - 1]; // jは1始まりなので -1
-                    // currentRow.id = `line_${j}`;
-                    if (user_answer_list[j] === undefined) {
-                        user_answer_list[j] = ""
-                    }
-                    if (user_answer_list[j] === LogLines[j - 1].isSuspicious) {
-                        ResultWhich = "✅"
-                    }
-                    else {
-                        ResultWhich = "✖"
-                    }
-                    if (user_answer_list[j] === "") {
-                        user_answer_list[j] = "不正アクセスではない"
-                    }
-                    correctrate=Math.floor(sum_of_selected / sum_of_badaccess * 100)
-                    // YourScore.innerText = sum_of_selected + "個正解/" + sum_of_badaccess + "個中 (正答率：" + Math.floor(sum_of_selected / sum_of_badaccess * 100) + "%)"
-                    YourScore.innerText=sum_of_selected;
-                    BadaccessNum.innerText=sum_of_badaccess;
-                    CorrectRate.innerText=correctrate;
-                    TableBody2.innerHTML += `
+
+                console.log("FinalAnswerボタンがクリックされました");
+                // ResultAnimation.style.display = "none"
+               //setTimeout(function () {               
+                 ToResult.style.display="block"
+                    for (let j = 1; j <= 20; j++) {
+                        // let currentRow = TableBody2.rows[j - 1]; // jは1始まりなので -1
+                        // currentRow.id = `line_${j}`;
+                        if (user_answer_list[j] === undefined) {
+                            user_answer_list[j] = ""
+                        }
+                        if (user_answer_list[j] === LogLines[j - 1].isSuspicious) {
+                            ResultWhich = "✅"
+                        }
+                        else {
+                            ResultWhich = "✖"
+                        }
+                        if (user_answer_list[j] === "") {
+                            user_answer_list[j] = "不正アクセスではない"
+                        }
+                        correctrate = Math.floor(sum_of_selected / sum_of_badaccess * 100)
+                        // YourScore.innerText = sum_of_selected + "個正解/" + sum_of_badaccess + "個中 (正答率：" + Math.floor(sum_of_selected / sum_of_badaccess * 100) + "%)"
+                        YourScore.innerText = sum_of_selected;
+                        BadaccessNum.innerText = sum_of_badaccess;
+                        CorrectRate.innerText = correctrate;
+                        TableBody2.innerHTML += `
         <td>${j}</td>
         <td>${String(user_answer_list[j])}</td>
         <td>${LogLines[j - 1].isSuspicious}</td>
         <td>${ResultWhich}</td>`
 
-                    //                 let currentRow = TableBody2.rows[j - 1]; // jは1始まりなので -1
-                    //                 currentRow.addEventListener("click",function(){
-                    //     console.log("aaaaaa")
-                    // })
-                }
+                        //                 let currentRow = TableBody2.rows[j - 1]; // jは1始まりなので -1
+                        //                 currentRow.addEventListener("click",function(){
+                        //     console.log("aaaaaa")
+                        // })
+                    }
+               //}, 300)
+
+                //結果アニメーション
+
+
                 // let LogTable=document.getElementById("log_table")
                 //         let rows1 = LogTable.getElementsByTagName("tr"); // 既にある<tr>たち
                 //         let rows2 = TableBody2.getElementsByTagName("tr"); // 既にある<tr>たち
@@ -748,12 +826,23 @@
                 //         // 例えば別のdivにログを表示したい場合:
                 //         // document.getElementById("log_display").innerText = LogLines[j - 1].details;
                 //     });
+
+                //結果を閉じる
+                ResultCloseBtn = document.getElementById("result_close_btn")
+                if (ResultCloseBtn) {
+                    ResultCloseBtn.addEventListener("click", function () {
+                        if (ToResult.style.display === 'block') {
+                            ToResult.style.display = 'none';
+                        }
+                    }, false);
+                }
+
                 let LogTable = document.getElementById("log_table");
                 let rows1 = LogTable.getElementsByTagName("tr"); // 既にある<tr>たち
                 let rows2 = TableBody2.getElementsByTagName("tr"); // 既にある<tr>たち
 
                 for (let g = 1; g <= 20; g++) {
-                    let row1 = rows1[g ];
+                    let row1 = rows1[g];
                     let row2 = rows2[g - 1]; // 配列は0始まりなので g-1
 
                     let question_line = document.getElementById(`line_${g}`);
@@ -761,46 +850,46 @@
 
 
 
-                        // 新しい行を挿入
-                        // let newRow = ResultTable.insertRow(rowIndex + 1);
-                        // newRow.style.backgroundColor="gray"
-                        // let cell1 = newRow.insertCell(0); // 1列目
-                        // cell1.colSpan = 1;
+                    // 新しい行を挿入
+                    // let newRow = ResultTable.insertRow(rowIndex + 1);
+                    // newRow.style.backgroundColor="gray"
+                    // let cell1 = newRow.insertCell(0); // 1列目
+                    // cell1.colSpan = 1;
 
-                        // question_line を新しい行に追加
-                        // question_lineはDOM要素なので、そのまま追加する
-                        // newRow.appendChild(question_line.cloneNode(true)); // cloneNodeで複製して追加
+                    // question_line を新しい行に追加
+                    // question_lineはDOM要素なので、そのまま追加する
+                    // newRow.appendChild(question_line.cloneNode(true)); // cloneNodeで複製して追加
 
-                        insertedRow = null;
-                        isInserted = false;
-                        // 追加した行をrow2の次の行として挿入
-                        let nextSibling = rows2[g - 1].nextElementSibling;
-                        let row1Clone = row1.cloneNode(true);
-                        // ResultTable.insertBefore(newRow, nextSibling);
+                    insertedRow = null;
+                    isInserted = false;
+                    // 追加した行をrow2の次の行として挿入
+                    let nextSibling = rows2[g - 1].nextElementSibling;
+                    let row1Clone = row1.cloneNode(true);
+                    // ResultTable.insertBefore(newRow, nextSibling);
 
-                        row2.addEventListener("click", function () {
-                            if (isInserted) {
-                                // ResultTable.deleteRow(insertedRow.rowIndex);
-                                insertedRow.remove();
-                                insertedRow = null;
-                                isInserted = false;
-                            }
-                            else{
-                                insertedRow = document.createElement("tr");
-            let cell = document.createElement("td");
-            cell.colSpan = row2.cells.length;
-            cell.style.backgroundColor = "gray";
-            cell.appendChild(row1Clone.cloneNode(true)); // 中身だけ挿入
-            insertedRow.appendChild(cell);
+                    row2.addEventListener("click", function () {
+                        if (isInserted) {
+                            // ResultTable.deleteRow(insertedRow.rowIndex);
+                            insertedRow.remove();
+                            insertedRow = null;
+                            isInserted = false;
+                        }
+                        else {
+                            insertedRow = document.createElement("tr");
+                            let cell = document.createElement("td");
+                            cell.colSpan = row2.cells.length;
+                            cell.style.backgroundColor = "gray";
+                            cell.appendChild(row1Clone.cloneNode(true)); // 中身だけ挿入
+                            insertedRow.appendChild(cell);
 
-            row2.parentNode.insertBefore(insertedRow, row2.nextSibling); // row2 のすぐ下に挿入
-            isInserted = true;
-                            }
-                        })
-                        // ここにログ表示処理などを追加できます
-                        // 例えば別のdivにログを表示したい場合:
-                        // document.getElementById("log_display").innerText = LogLines[g - 1].details;
-                    
+                            row2.parentNode.insertBefore(insertedRow, row2.nextSibling); // row2 のすぐ下に挿入
+                            isInserted = true;
+                        }
+                    })
+                    // ここにログ表示処理などを追加できます
+                    // 例えば別のdivにログを表示したい場合:
+                    // document.getElementById("log_display").innerText = LogLines[g - 1].details;
+
                 }
 
 

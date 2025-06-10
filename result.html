@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Result</title>
+</head>
+<body>
+    <div class="header">
+
+    </div>
+    <div class="start">
+        <video controls height="550" class="movie">
+            <source src="story.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let StartBtn = document.getElementById("start_btn")
+            StartBtn.addEventListener("click", function () {
+                let name = document.getElementById("name").value
+            });
+        });
+    </script>
+</body>
+</html>
